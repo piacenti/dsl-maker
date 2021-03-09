@@ -1,0 +1,174 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath "g.piacenti.tools.antlr-kotlin:antlr-kotlin-gradle-plugin:$antlrKotlinVersion"
+    }
+}
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform' version '1.4.20'
+    id "com.jfrog.bintray" version "1.8.4"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.20"
+}
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'antlr'
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+//dependencies {
+//     antlr 'org.antlr:antlr4:4.7.1'
+//}
+
+kotlin {
+    jvm() { // Creates a JVM target with the default name 'jvm'
+        withJava()
+    }
+    js() {// JS target named 'js'
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
+        }
+    }
+
+    sourceSets {
+        commonAntlr {
+            dependencies {
+                api kotlin("stdlib-common")
+                // add antlr-kotlin-runtime
+                // otherwise, the generated sources will not compile
+                api "g.piacenti.tools.antlr-kotlin:antlr-kotlin-runtime:$antlrKotlinVersion"
+                // antlr-kotlin-runtime-jvm is automatically added as an jvm dependency by gradle
+            }
+            // you have to add the generated sources the to the kotlin compiler source directory list
+            // this is not required if you use src/commonAntlr/kotlin
+            // and want to add the generated sources to version control
+            kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
+        }
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common')
+                implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
+                api "g.piacenti.tools.antlr-kotlin:antlr-kotlin-runtime:$antlrKotlinVersion"
+            }
+        }
+        commonTest {
+            dependsOn commonAntlr
+            dependencies {
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+            }
+        }
+        jvmMain {
+            dependsOn commonMain
+            dependencies {
+                implementation (kotlin('stdlib-jdk8'))
+                implementation 'org.apache.logging.log4j:log4j-api:2.12.1'
+                implementation 'org.apache.logging.log4j:log4j-core:2.12.1'
+                implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.12.1'
+            }
+        }
+        // JVM-specific tests and their dependencies:
+
+        jvmTest {
+            kotlin.srcDirs(["$buildDir/generated-src/antlr"] as Set)
+            dependsOn commonTest
+            dependencies {
+                implementation kotlin('test-junit')
+//                implementation "org.antlr:antlr4-runtime:4.7.1"
+                implementation 'com.thoughtworks.xstream:xstream:1.4.7'
+            }
+        }
+        js().compilations.all {
+            kotlinOptions {
+                moduleKind = "commonjs"
+                sourceMap = true
+                sourceMapEmbedSources = "always"
+            }
+        }
+        jsMain {
+            dependsOn commonMain
+            dependencies {
+                implementation kotlin('stdlib-js')
+            }
+        }
+        jsTest {
+            dependsOn commonTest
+            dependencies {
+                implementation kotlin('test-js')
+
+            }
+        }
+    }
+}
+//generateTestGrammarSource {
+//    source = project.objects
+//            .sourceDirectorySet("antlr", "antlr")
+//            .srcDir("src/jvmTest/antlr").with {
+//        include("*.g4")
+//    }
+//    arguments.addAll(["-package", "antlr.jvm"/*,"-atn"*/])
+//    outputDirectory = file("$projectDir/src/jvmTest/java/antlr/jvm")
+//}
+task generateKotlinCommonGrammarSource(type: com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask) {
+    // the classpath used to run antlr code generation
+    antlrClasspath = configurations.detachedConfiguration(
+            project.dependencies.create("g.piacenti.tools.antlr-kotlin:antlr-kotlin-target:$antlrKotlinVersion")
+    )
+    maxHeapSize = "64m"
+    packageName = "piacenti.dslmaker.antlr.generated"
+//    arguments = ["-atn"]
+    source = project.objects
+            .sourceDirectorySet("antlr", "antlr")
+            .srcDir("src/commonAntlrTest/antlr").with {
+        include("*.g4")
+    }
+    // outputDirectory is required, put it into the build directory
+    // if you do not want to add the generated sources to version control
+    outputDirectory = file("$buildDir/generated-src/commonAntlr/kotlin")
+}
+compileTestKotlinJvm.dependsOn generateKotlinCommonGrammarSource
+compileTestKotlinJs.dependsOn generateKotlinCommonGrammarSource
+jvmTest {
+    jvmArgs "-Dlog.level=ERROR", "-Xmx2048M"
+}
+task fixAntlrKotlinBugs() {
+    group = "build"
+    doLast {
+        file("$buildDir/generated-src/commonAntlr/kotlin").traverse { f ->
+            if (f.isFile()) {
+                //remove java files
+                if (f.name.endsWith(".java"))
+                    f.delete()
+            }
+        }
+    }
+}
+generateKotlinCommonGrammarSource.finalizedBy fixAntlrKotlinBugs
+
+group = "g.piacenti.tools"
+version = "1.1.33"
+publishing {
+    repositories {
+        maven {
+            name = "bintray"
+            url = uri("https://api.bintray.com/maven/piacenti/piacenti-tools/parser/;publish=1;override=0")
+            credentials {
+                username = System.getenv("BINTRAY_USER")
+                password = System.getenv("BINTRAY_KEY")
+            }
+        }
+    }
+}

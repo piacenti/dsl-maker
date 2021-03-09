@@ -1,0 +1,12 @@
+<Configuration status="info">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd hh:mm:ss a} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="${sys:log.level:-error}">
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>
