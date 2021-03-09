@@ -1,0 +1,2 @@
+rootProject.name = 'dsl-maker'
+//enableFeaturePreview("GRADLE_METADATA") not required and causes issues when using maven local

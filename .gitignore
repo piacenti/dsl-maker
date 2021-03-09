@@ -1,0 +1,23 @@
+IDEs/
+classes/
+/machine learning/**/*.zip
+**/*.class
+*.iml
+*.iws
+*ipr
+.gradle
+build/
+.idea
+.settings
+.project
+.classpath
+.metadata
+*.zip.*
+/Server/nbproject/private/
+/Server/nbbuild/
+/Server/dist/
+lib
+pom.xml
+**/out/**
+*.interp
+*.tokens
