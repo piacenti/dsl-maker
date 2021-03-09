@@ -21,3 +21,4 @@ pom.xml
 **/out/**
 *.interp
 *.tokens
+gen/
