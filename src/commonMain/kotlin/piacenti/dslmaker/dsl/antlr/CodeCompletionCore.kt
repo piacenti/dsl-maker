@@ -105,13 +105,13 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
                 continue
             }
             // select the right-most occurrence
-            val startToken: Int = shortcut.keys.max()!!
+            val startToken: Int = shortcut.keys.maxOrNull()!!
             val endSet = shortcut[startToken]
             val endToken: Int
             endToken = if (endSet!!.isEmpty()) {
                 tokens.size - 1
             } else {
-                shortcut[startToken]!!.max()!!
+                shortcut[startToken]!!.maxOrNull()!!
             }
             val startOffset: Int = tokens[startToken].startIndex
             val endOffset: Int
