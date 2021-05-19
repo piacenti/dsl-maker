@@ -30,7 +30,7 @@ open class Grammar<T : GrammarInventory>(var startProduction: ProductionStep, va
                         if (thereIsNoMatchingProductionForThisStep(step, productionNames)) {
                             try {
                                 val newProductionStep = ProductionStep(
-                                        step.name.toUpperCase().replace("_LEAF".toRegex(), ""))
+                                        step.name.uppercase().replace("_LEAF".toRegex(), ""))
                                 val newProduction = Production(null)
                                 newProduction.expressions.add(Expression(step))
                                 toAdd[newProductionStep] = newProduction
@@ -55,7 +55,7 @@ open class Grammar<T : GrammarInventory>(var startProduction: ProductionStep, va
     private fun thereIsNoMatchingProductionForThisStep(step: ProductionStep, productionNames: Set<String>): Boolean {
         if (step.isProduction) return false
         //productions by convention should be upper case
-        var name = step.name.toUpperCase()
+        var name = step.name.uppercase()
         //tokens following the _LEAF ending convention should be disconsidered
         if (name.endsWith("_LEAF")) {
             name = name.replace("_LEAF", "")
