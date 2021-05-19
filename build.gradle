@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
     }
@@ -12,9 +11,9 @@ buildscript {
     }
 }
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.4.20'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.20"
-    id("org.jetbrains.dokka") version "1.4.20"
+    id 'org.jetbrains.kotlin.multiplatform' version '1.5.0'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.5.0"
+    id("org.jetbrains.dokka") version "1.4.32"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 apply plugin: 'maven-publish'
@@ -168,10 +167,6 @@ generateKotlinCommonGrammarSource.finalizedBy fixAntlrKotlinBugs
 task javadocJar(type: Jar, dependsOn: dokkaHtml) {
     archiveClassifier.set('javadoc')
     from dokkaHtml.outputDirectory
-}
-task sourcesJar(type: Jar) {
-    archiveClassifier.set("sources")
-    from sourceSets.main.allSource
 }
 artifacts {
     archives javadocJar, sourcesJar

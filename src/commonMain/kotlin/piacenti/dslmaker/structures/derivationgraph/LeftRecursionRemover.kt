@@ -114,7 +114,7 @@ internal class LeftRecursionRemover {
                 indirectRecursionProductions.add(key to recursiveForKey)
             }
         }
-        return indirectRecursionProductions.maxBy { pair ->
+        return indirectRecursionProductions.maxByOrNull { pair ->
             countNumberOfExpressionsUsingIt(grammar, pair.first)
         }
     }
