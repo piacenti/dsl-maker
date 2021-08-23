@@ -56,7 +56,7 @@ class AntlrCompleter : AutoCompleter {
         val tokenStream = CommonTokenStream(lexer)
         val parser = JSONParser(tokenStream)
          parser.json()
-        val curry = { text: String, description: String -> Completion(text, description, startOfCompletionCaretPosition, currentCaretPosition) }
+        val curry = { completionText: String, description: String -> Completion(completionText, text, startOfCompletionCaretPosition, currentCaretPosition,description) }
         val result = mutableListOf<Completion>()
         val suggestCompletions = AntlrCompletionSuggester().suggestCompletions(parser)
         result.addAll(suggestCompletions.tokens.map { it.id }.mapNotNull {
@@ -82,10 +82,9 @@ class CompleterTest {
         val pos = 13
         val suggestCompletion = AntlrCompleter().suggestCompletion("""{"something":"another"}""", pos, pos)
         suggestCompletion.size validateEquals 3
-        suggestCompletion[0].type=="value"
-        suggestCompletion[1].type=="object"
-        suggestCompletion[2].type=="array"
-
+        suggestCompletion[0].type validateEquals "value"
+        suggestCompletion[1].type validateEquals "object"
+        suggestCompletion[2].type validateEquals "array"
     }
 
     @Test

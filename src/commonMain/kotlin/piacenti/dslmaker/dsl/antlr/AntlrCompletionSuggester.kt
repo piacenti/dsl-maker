@@ -3,6 +3,7 @@ package piacenti.dslmaker.dsl.antlr
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.Parser
 import org.antlr.v4.kotlinruntime.Token
+import org.antlr.v4.kotlinruntime.atn.ActionTransition
 import org.antlr.v4.kotlinruntime.atn.AtomTransition
 import org.antlr.v4.kotlinruntime.atn.BasicBlockStartState
 import org.antlr.v4.kotlinruntime.atn.BasicState
@@ -11,6 +12,7 @@ import org.antlr.v4.kotlinruntime.atn.EpsilonTransition
 import org.antlr.v4.kotlinruntime.atn.LoopEndState
 import org.antlr.v4.kotlinruntime.atn.PlusBlockStartState
 import org.antlr.v4.kotlinruntime.atn.PlusLoopbackState
+import org.antlr.v4.kotlinruntime.atn.PrecedencePredicateTransition
 import org.antlr.v4.kotlinruntime.atn.RuleStartState
 import org.antlr.v4.kotlinruntime.atn.RuleStopState
 import org.antlr.v4.kotlinruntime.atn.RuleTransition
@@ -54,7 +56,8 @@ class AntlrCompletionSuggester {
 
     data class Rule(val ruleIndex: Int, val pathStack: MutableList<RulePath> = mutableListOf()/*,
                     val pathsToFailure: MutableList<MutableList<Int>> = mutableListOf(),
-                    val pathToMatch: MutableList<Int> = mutableListOf()*/) {
+                    val pathToMatch: MutableList<Int> = mutableListOf()*/,
+                    val precedence:Int?=null) {
         val statesSeen = mutableSetOf<Int>()
         val startTokenIndex: Int = pathStack.first().tokenIndex
         /*val stopTokenIndex: Int
@@ -71,7 +74,8 @@ class AntlrCompletionSuggester {
                         val pathOfMatch: MutableList<Int>,/*should be copy of previous path state
                         should be specific for each branch*/
                         val tokensMatched: MutableList<Int>,
-                        val transitionType: TransitionType = TransitionType.REGULAR) {
+                        val transitionType: TransitionType = TransitionType.REGULAR,
+                        ) {
         val startState = statesPathOfMatch.first()
         val stopState = statesPathOfMatch.last()
     }
@@ -115,16 +119,24 @@ class AntlrCompletionSuggester {
                     //transitions deal with path stack
                     var currentTokenIndex = currentBranch.tokenIndex
                     val stateIndexPair = StateIndexPair(target.stateNumber, currentTokenIndex)
+                    var precedence:Int?=null
                     if (!stateIndexPairs.contains(stateIndexPair)) {
 //                        iterationCount++
 //                        if (currentTokenIndex >= highestReachedIndex)
 //                            println("iteration $iterationCount rule name '${parser.ruleNames!![currentRule.ruleIndex]}' index $highestReachedIndex state ${target.stateNumber}")
                         when (transition) {
-                            is EpsilonTransition -> {
+                            is EpsilonTransition, is ActionTransition, is PrecedencePredicateTransition-> {
                                 branchStack.add(RulePath(target.transitions.iterator(),
                                         currentTokenIndex,
                                         statesPathOfMatch, pathOfMatch, tokensMatched))
                             }
+//                            is PrecedencePredicateTransition->{
+//                                if(currentRule.precedence==null || currentRule.precedence>=transition.precedence){
+//                                    branchStack.add(RulePath(target.transitions.iterator(),
+//                                        currentTokenIndex,
+//                                        statesPathOfMatch, pathOfMatch, tokensMatched))
+//                                }
+//                            }
                             is RuleTransition -> {
                                 //fabricate epsilon transition to follow state
                                 val fabricatedTransition = EpsilonTransition(transition.followState)
@@ -132,6 +144,7 @@ class AntlrCompletionSuggester {
                                         currentTokenIndex,
                                         statesPathOfMatch, pathOfMatch, tokensMatched, TransitionType.FOLLOWSET))
                                 pathOfMatch.add(transition.ruleIndex)
+                                precedence=transition.precedence
                             }
                             is AtomTransition -> {
                                 val currentToken = allTokens[currentTokenIndex]
@@ -189,7 +202,7 @@ class AntlrCompletionSuggester {
                                     succeededTransition = false
                                 }
                             }
-                            else -> throw UnsupportedOperationException(target::class.simpleName)
+                            else -> throw UnsupportedOperationException(transition::class.simpleName)
                         }
                         //no point in processing target of transition if it fails
                         if (succeededTransition) {
@@ -207,7 +220,7 @@ class AntlrCompletionSuggester {
 //                                println("adding rule ${parser.ruleNames!![target.ruleIndex]}")
                                     ruleStack.add(Rule(target.ruleIndex, mutableListOf(RulePath(target.transitions.iterator(),
                                             currentTokenIndex,
-                                            mutableListOf(target.stateNumber), mutableListOf(), mutableListOf()))))
+                                            mutableListOf(target.stateNumber), mutableListOf(), mutableListOf())),precedence))
                                     break@inner
                                 }
                                 is RuleStopState -> {

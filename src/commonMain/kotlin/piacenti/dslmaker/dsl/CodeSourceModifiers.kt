@@ -82,6 +82,7 @@ interface TextModifier {
                                 } else
                                     acc
                             }
+                            insertAfterIfNotSame(fullRange, i,map)
                             i = if (fullRange.end > i) fullRange.end else i + 1
                         } else if (!replaceEmpty) {
                             val overArchingMod = replace.foldRight(replace.first()) { value, acc ->
@@ -94,12 +95,10 @@ interface TextModifier {
                             }
                             append(overArchingMod.text)
                             val end = overArchingMod.range?.end
+                            insertAfterIfNotSame(overArchingMod.range, i,map)
                             i = if (end != null && end > i) end else i + 1
                         }
-                        val after = list.filter { it.order == Order.AFTER }.sortedByDescending { it.insertionType }
-                        after.forEach {
-                            append(it.text)
-                        }
+                        insertAfter(list)
                     } else {
                         append(originalCharTransformation(char))
                         i++
@@ -114,6 +113,19 @@ interface TextModifier {
                 }
             }
 
+        }
+        private fun StringBuilder.insertAfterIfNotSame(fullRange: IntRange?, i: Int, textComputations: Map<Int, List<TextModification>>) {
+            //insert after statements before skipping if last index is not current index
+            if (fullRange != null && fullRange.last != i)
+                textComputations[fullRange.last]?.let {
+                    insertAfter(it)
+                }
+        }
+        private fun StringBuilder.insertAfter(list: List<TextModification>) {
+            val after = list.filter { it.order == Order.AFTER }.sortedByDescending { it.insertionType }
+            after.forEach {
+                append(it.text)
+            }
         }
     }
 }
