@@ -13,6 +13,7 @@ import piacenti.dslmaker.dsl.antlr.AntlrAutoCompleter
 import piacenti.dslmaker.dsl.antlr.AntlrCompletionData
 import piacenti.dslmaker.validateEquals
 import kotlin.test.Test
+import org.antlr.v4.kotlinruntime.tree.ParseTree
 
 enum class DataType {
     JSON, XML, UNKNOWN
@@ -55,7 +56,7 @@ class IndentBasedCompleterAntlr : AntlrAutoCompleter<IndentBasedParser>() {
         return indentBasedLexer
     }
 
-    override fun processSuggestions(antlrCompletionData: AntlrCompletionData, completionFactory: (text: String, type: String) -> Completion): Set<Completion> {
+    override fun processSuggestions(antlrCompletionData: AntlrCompletionData, parseTree: ParseTree, completionFactory: (text: String, type: String) -> Completion): Set<Completion> {
         val result = mutableSetOf<Completion>()
         val ruleIds = antlrCompletionData.rules.map { it.id }
         val tokenIds = antlrCompletionData.tokens.map { it.id }
