@@ -64,6 +64,10 @@ class FastTokenStreamRewriter(val tokenStream: TokenStream) {
         textComputations.getOrPut(from.startIndex) { mutableListOf() }
             .add(TextModification("", Order.DELETE, range = from.startIndex..to.stopIndex))
     }
+    fun removeEdit(token:Token?, predicate:(TextModification)->Boolean){
+        tokenComputations[token?.tokenIndex ?: 0]?.removeAll(predicate)
+        textComputations[token?.stopIndex ?: 0]?.removeAll(predicate)
+    }
 
     val text: String
         get() {

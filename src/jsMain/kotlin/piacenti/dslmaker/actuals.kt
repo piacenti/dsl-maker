@@ -24,7 +24,7 @@ private fun String.genericRegexString(): Pair<String, MutableSet<RegexOption>> {
         when {
             match.contains("m") -> options.add(RegexOption.MULTILINE)
             match.contains("i") -> options.add(RegexOption.IGNORE_CASE)
-            match.contains("s") -> result = result.replace("([^\\\\])\\.".toRegex(), """$1[\s\S]""")
+            match.contains("s") -> result = result.replace("([^\\\\])\\.".toRegex(), """$1[\\s\\S]""")
             else -> Unit
         }
     }
