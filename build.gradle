@@ -6,14 +6,14 @@ buildscript {
     }
     dependencies {
         classpath "com.github.piacenti:antlr-kotlin-gradle-plugin:$antlrKotlinVersion"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.4.32"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.6.10"
 
     }
 }
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.5.20'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.5.20"
-    id("org.jetbrains.dokka") version "1.4.32"
+    id 'org.jetbrains.kotlin.multiplatform' version '1.6.10'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.6.10"
+    id("org.jetbrains.dokka") version "1.6.10"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 apply plugin: 'maven-publish'
@@ -35,7 +35,8 @@ kotlin {
     jvm() { // Creates a JVM target with the default name 'jvm'
         withJava()
     }
-    js() {// JS target named 'js'
+    js {
+//    js(BOTH) {// JS target named 'js'
         browser {
             testTask {
                 useKarma {
@@ -78,9 +79,9 @@ kotlin {
             dependsOn commonMain
             dependencies {
                 implementation (kotlin('stdlib-jdk8'))
-                implementation 'org.apache.logging.log4j:log4j-api:2.12.1'
-                implementation 'org.apache.logging.log4j:log4j-core:2.12.1'
-                implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.12.1'
+                implementation 'org.apache.logging.log4j:log4j-api:2.17.1'
+                implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+                implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.1'
             }
         }
         // JVM-specific tests and their dependencies:
@@ -147,6 +148,7 @@ task generateKotlinCommonGrammarSource(type: com.strumenta.antlrkotlin.gradleplu
 }
 compileTestKotlinJvm.dependsOn generateKotlinCommonGrammarSource
 compileTestKotlinJs.dependsOn generateKotlinCommonGrammarSource
+// waiting for issue https://youtrack.jetbrains.com/issue/KT-43490 to be resolved before we can enable IR
 //compileTestKotlinJsIr.dependsOn generateKotlinCommonGrammarSource
 //compileTestKotlinJsLegacy.dependsOn generateKotlinCommonGrammarSource
 jvmTest {
@@ -178,7 +180,7 @@ artifacts {
 // publish by calling tasks
 // publishAllPublicationsToMavenCentralRepository closeAndReleaseMavenCentralStagingRepository
 group = "com.github.piacenti"
-version = "1.1.37"
+version = "1.1.40"
 nexusPublishing {
     repositories {
         mavenCentral {
