@@ -39,34 +39,62 @@ abstract class AntlrFormatterAndHighlighterBase : AntlrFormatterAndHighlighter {
         return highlightAndFormat(text, format = false, highlight = true).rewriter.allComputations
     }
 
-    protected abstract fun highlightAndFormat(text: String, format: Boolean, highlight: Boolean): AntlrFormatterAndHighlighterListener
+    protected abstract fun highlightAndFormat(
+        text: String,
+        format: Boolean,
+        highlight: Boolean
+    ): AntlrFormatterAndHighlighterListener
 }
 
+enum class StyleDefinitionType {
+    CSS_CLASS, STYLE_ATTRIBUTE
+}
 
-interface AntlrFormatterAndHighlighterListener {
-    val highlight: Boolean
-    val format: Boolean
-    val tabType: String
-    val result: String get() = rewriter.text
+interface AntlrHTMLHighlighterListener {
     val tokenStream: CommonTokenStream
     val rewriter: FastTokenStreamRewriter
-
-    fun highlightToken(token: Token?, htmlClass: String, attributes: List<Pair<String, String>> = emptyList()) {
+    val defaultDefinitionType: StyleDefinitionType
+        get() = StyleDefinitionType.CSS_CLASS
+    fun highlightToken(
+        token: Token?,
+        definitions: String,
+        attributes: List<Pair<String, String>> = emptyList(),
+        definitionType: StyleDefinitionType = defaultDefinitionType
+    ) {
         if (token == null)
             return
         var attributeText = attributes.joinToString(separator = " ") { "${it.first}=${it.second}" }
         if (attributes.isNotEmpty())
             attributeText = " $attributeText"
-        rewriter.replace(token, "<span class='$htmlClass'$attributeText>${token.text}</span>")
+        val highlightAttributeText = getHighlightAttributeText(definitionType)
+        rewriter.replace(token, "<span $highlightAttributeText='$definitions'$attributeText>${token.text}</span>")
     }
 
-    fun highlightTokenRange(tokens: Pair<Token?, Token?>, htmlClass: String, attributes: List<Pair<String, String>> = emptyList()) {
+    fun highlightTokenRange(
+        tokens: Pair<Token?, Token?>,
+        definitions: String,
+        attributes: List<Pair<String, String>> = emptyList(),
+        definitionType: StyleDefinitionType = defaultDefinitionType
+    ) {
         val first = tokens.first
         val second = tokens.second
         if (first == null || second == null)
             return
         val attributeText = attributes.joinToString(separator = " ") { "${it.first}=${it.second}" }
-        rewriter.insertBefore(first, "<span class='$htmlClass'$attributeText>", InsertionType.STYLE)
+        val highlightAttributeText = getHighlightAttributeText(definitionType)
+        rewriter.insertBefore(first, "<span $highlightAttributeText='$definitions'$attributeText>", InsertionType.STYLE)
         rewriter.insertAfter(second, "</span>", InsertionType.STYLE)
     }
+
+    fun getHighlightAttributeText(definitionType: StyleDefinitionType) =
+        if (definitionType == StyleDefinitionType.CSS_CLASS) "class" else "style"
+}
+interface AntlrHTMLFormatterListener{
+    val rewriter: FastTokenStreamRewriter
+    val tabType: String
+}
+interface AntlrFormatterAndHighlighterListener : AntlrHTMLHighlighterListener, AntlrHTMLFormatterListener {
+    val highlight: Boolean
+    val format: Boolean
+    val result: String get() = rewriter.text
 }

@@ -180,7 +180,7 @@ artifacts {
 // publish by calling tasks
 // publishAllPublicationsToMavenCentralRepository closeAndReleaseMavenCentralStagingRepository
 group = "com.github.piacenti"
-version = "1.1.41"
+version = "1.1.42"
 nexusPublishing {
     repositories {
         mavenCentral {
