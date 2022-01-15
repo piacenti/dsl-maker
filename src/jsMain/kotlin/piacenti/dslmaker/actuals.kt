@@ -21,11 +21,12 @@ private fun String.genericRegexString(): Pair<String, MutableSet<RegexOption>> {
     val regex = """\(\?([ims]+?)\)""".toRegex()
     regex.find(this)?.let {
         val match = it.groupValues[1]
-        when {
-            match.contains("m") -> options.add(RegexOption.MULTILINE)
-            match.contains("i") -> options.add(RegexOption.IGNORE_CASE)
-            match.contains("s") -> result = result.replace("([^\\\\])\\.".toRegex(), """$1[\\s\\S]""")
-            else -> Unit
+        match.forEach {
+            when (it) {
+                'm' -> options.add(RegexOption.MULTILINE)
+                'i' -> options.add(RegexOption.IGNORE_CASE)
+                's' -> result = result.replace("([^\\\\])\\.".toRegex(), """$1[\\s\\S]""")
+            }
         }
     }
     result = result.replace(regex, "")
@@ -68,13 +69,15 @@ actual fun regexMatchFromOffset(text: String, patternString: String, startIndex:
 private fun regexMatch1(patternString: String, text: String, startIndex: Int): RegexMatch? {
     val match = patternString.genericRegex().find(text.substring(startIndex))
     return match?.let { matchResult ->
-        RegexMatch(matchResult.groups.mapNotNull { it }.map { Group(it.value, startIndex + matchResult.range.first, startIndex + matchResult.range.end) })
+        RegexMatch(matchResult.groups.mapNotNull { it }
+            .map { Group(it.value, startIndex + matchResult.range.first, startIndex + matchResult.range.end) })
     }
 }
 
 data class PatternAndOptions(val pattern: String, val options: String)
 
 private val patternMap = mutableMapOf<String, PatternAndOptions>()
+
 //this should be faster but it is actually slower so ignoring it for now
 private fun regexMatch2(patternString: String, text: String, startIndex: Int): RegexMatch? {
     val patternAndOption = patternMap.getOrPut(patternString) {
