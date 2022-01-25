@@ -92,7 +92,7 @@ kotlin {
             dependencies {
                 implementation kotlin('test-junit')
 //                implementation "org.antlr:antlr4-runtime:4.7.1"
-                implementation 'com.thoughtworks.xstream:xstream:1.4.7'
+                implementation 'com.thoughtworks.xstream:xstream:1.4.18'
                 implementation "io.mockk:mockk:1.11.0"
             }
         }
