@@ -184,8 +184,8 @@ version = "1.1.43"
 nexusPublishing {
     repositories {
         mavenCentral {
-            username = System.getenv("ossrhTokenId")
-            password = System.getenv("ossrhPTokenValue")
+            username = System.getenv("OSSR_TOKEN_ID")
+            password = System.getenv("OSSR_TOKEN_VALUE")
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
@@ -225,8 +225,8 @@ publishing {
     }
 }
 signing {
-    def signingKey = System.getenv("signingKey")
-    def signingPassword = System.getenv("signingPassword")
+    def signingKey = System.getenv("SIGNING_KEY")
+    def signingPassword = System.getenv("SIGNING_PASSWORD")
     useInMemoryPgpKeys(signingKey, signingPassword)
     publishing.publications.forEach{
         sign it
