@@ -43,5 +43,5 @@ jobs:
       env:
         OSSR_TOKEN_ID: ${{ secret.OSSR_TOKEN_ID }}
         OSSR_TOKEN_VALUE: ${{ secrets.OSSR_TOKEN_VALUE }}
-        SIGNING_KEY: ${{ secret.SIGNING_KEY }}
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
