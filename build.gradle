@@ -181,6 +181,11 @@ artifacts {
 // publishAllPublicationsToMavenCentralRepository closeAndReleaseMavenCentralStagingRepository
 group = "com.github.piacenti"
 version = "1.1.44"
+task publishToCentral{
+    afterEvaluate {
+        dependsOn(publishAllPublicationsToMavenCentralRepository, closeAndReleaseMavenCentralStagingRepository)
+    }
+}
 nexusPublishing {
     repositories {
         mavenCentral {
