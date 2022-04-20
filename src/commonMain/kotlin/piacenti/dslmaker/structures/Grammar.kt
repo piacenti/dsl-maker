@@ -37,7 +37,7 @@ open class Grammar<T : GrammarInventory>(var startProduction: ProductionStep, va
                                 alreadyProcessed[step] = newProductionStep
                                 tExpression.steps[i] = newProductionStep
 
-                            } catch (e: Throwable) {
+                            } catch (e: Error) {
                                 println(e.message)
                             }
 
