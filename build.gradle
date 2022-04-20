@@ -51,7 +51,7 @@ kotlin {
                 // add antlr-kotlin-runtime
                 // otherwise, the generated sources will not compile
                 api "com.github.piacenti:antlr-kotlin-runtime:$antlrKotlinVersion"
-                // antlr-kotlin-runtime-jvm is automatically added as an jvm dependency by gradle
+                // antlr-kotlin-runtime-jvm is automatically added as an jvm dependency by gradle.
             }
             // you have to add the generated sources the to the kotlin compiler source directory list
             // this is not required if you use src/commonAntlr/kotlin
