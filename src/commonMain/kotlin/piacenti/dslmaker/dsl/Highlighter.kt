@@ -83,15 +83,10 @@ abstract class GrammarBasedHighlighter<T : GrammarInventory>(val grammar: Gramma
     override fun computeHighlighting(text: String, providedAST: ASTNode?, providedParser: GenericParser2<*>?): MutableMap<Int, List<TextModification>> {
         val properStyles = mutableListOf<StyleParse>()
         val partialStyles = mutableListOf<StyleParse>()
-        try {
+        //ignore errors while typing
+        kotlin.runCatching {
             handleStyleProduction(partialStyles, text, providedAST)
-        } catch (e: Throwable) {
-
-        }
-        try {
             handleStartProduction(properStyles, text, providedAST)
-        } catch (e: Throwable) {
-            //ignore errors while typing
         }
         if ((providedParser?.highestIndexParsed ?: parser.highestIndexParsed) < text.length) {
             return (processStyles(partialStyles, text, "error").combine(processStyles(properStyles, text, "error-line"))).toMutableMap()

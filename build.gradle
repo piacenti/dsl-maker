@@ -6,14 +6,14 @@ buildscript {
     }
     dependencies {
         classpath "com.github.piacenti:antlr-kotlin-gradle-plugin:$antlrKotlinVersion"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.6.10"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.6.20"
 
     }
 }
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.6.10'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.6.10"
-    id("org.jetbrains.dokka") version "1.6.10"
+    id 'org.jetbrains.kotlin.multiplatform' version '1.6.20'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.6.20"
+    id("org.jetbrains.dokka") version "1.6.20"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 apply plugin: 'maven-publish'
@@ -35,8 +35,7 @@ kotlin {
     jvm() { // Creates a JVM target with the default name 'jvm'
         withJava()
     }
-    js {
-//    js(BOTH) {// JS target named 'js'
+    js(BOTH) {// JS target named 'js'
         browser {
             testTask {
                 useKarma {
@@ -147,10 +146,10 @@ task generateKotlinCommonGrammarSource(type: com.strumenta.antlrkotlin.gradleplu
     outputDirectory = file("$buildDir/generated-src/commonAntlr/kotlin")
 }
 compileTestKotlinJvm.dependsOn generateKotlinCommonGrammarSource
-compileTestKotlinJs.dependsOn generateKotlinCommonGrammarSource
+//compileTestKotlinJs.dependsOn generateKotlinCommonGrammarSource
 // waiting for issue https://youtrack.jetbrains.com/issue/KT-43490 to be resolved before we can enable IR
-//compileTestKotlinJsIr.dependsOn generateKotlinCommonGrammarSource
-//compileTestKotlinJsLegacy.dependsOn generateKotlinCommonGrammarSource
+compileTestKotlinJsIr.dependsOn generateKotlinCommonGrammarSource
+compileTestKotlinJsLegacy.dependsOn generateKotlinCommonGrammarSource
 jvmTest {
     jvmArgs "-Dlog.level=ERROR", "-Xmx2048M"
 }
@@ -180,7 +179,7 @@ artifacts {
 // publish by calling tasks
 // publishAllPublicationsToMavenCentralRepository closeAndReleaseMavenCentralStagingRepository
 group = "com.github.piacenti"
-version = "1.1.44"
+version = "1.1.45"
 task publishToCentral{
     afterEvaluate {
         dependsOn(publishAllPublicationsToMavenCentralRepository, closeAndReleaseMavenCentralStagingRepository)
