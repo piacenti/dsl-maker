@@ -67,7 +67,8 @@ interface AntlrHTMLHighlighterListener {
         if (attributes.isNotEmpty())
             attributeText = " $attributeText"
         val highlightAttributeText = getHighlightAttributeText(definitionType)
-        rewriter.replace(token, "<span $highlightAttributeText='$definitions'$attributeText>${token.text}</span>")
+        rewriter.insertBefore(token, "<span $highlightAttributeText='$definitions'$attributeText>",InsertionType.STYLE)
+        rewriter.insertAfter(token, "</span>",InsertionType.STYLE)
     }
 
     fun highlightTokenRange(
