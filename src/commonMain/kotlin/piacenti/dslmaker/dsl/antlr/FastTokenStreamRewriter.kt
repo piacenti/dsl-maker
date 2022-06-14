@@ -1,6 +1,7 @@
 package piacenti.dslmaker.dsl.antlr
 
 import com.strumenta.kotlinmultiplatform.assert
+import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.ParserRuleContext
 import org.antlr.v4.kotlinruntime.Token
 import org.antlr.v4.kotlinruntime.TokenStream
@@ -48,9 +49,11 @@ class FastTokenStreamRewriter(val tokenStream: TokenStream) {
             .add(TextModification(text.toString(), Order.BEFORE, insertionType))
 
     }
+
     fun replace(p: ParseTree?, text: Any) {
         replace(p, null, text)
     }
+
     fun replace(p: ParseTree?, p2: ParseTree? = null, text: Any) {
         val (token1, token2) = selectTokens(p, p2)
         if (token1 != null && token2 != null && token1 != token2) {
@@ -101,6 +104,22 @@ class FastTokenStreamRewriter(val tokenStream: TokenStream) {
             else -> null
         }
         return Pair(token1, token2)
+    }
+
+    fun deleteHiddenTokensOfTypesAround(p: ParseTree?, type: List<Int>) {
+        val (token1, token2) = selectTokens(p, null)
+        if (tokenStream is CommonTokenStream) {
+            if (token1 != null) {
+                tokenStream.getHiddenTokensToLeft(token1.tokenIndex)?.filter { it.type in type }?.forEach {
+                    delete(it)
+                }
+            }
+            if (token2 != null) {
+                tokenStream.getHiddenTokensToRight(token2.tokenIndex)?.filter { it.type in type }?.forEach {
+                    delete(it)
+                }
+            }
+        }
     }
 
     fun delete(t: Token?) {
