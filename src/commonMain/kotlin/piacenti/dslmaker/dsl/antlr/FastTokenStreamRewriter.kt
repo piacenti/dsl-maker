@@ -32,7 +32,13 @@ class FastTokenStreamRewriter(val tokenStream: TokenStream) {
         if (t == null) return
         tokenComputations.getOrPut(t.tokenIndex) { mutableListOf() }
             .add(TextModification(text.toString(), Order.AFTER, insertionType))
-        textComputations.getOrPut(t.stopIndex) { mutableListOf() }
+        // EOF has a start index that is after the stop index. Here we make sure to choose start index in those cases
+        val index=if(t.type==-1){
+            t.startIndex
+        } else{
+            t.stopIndex
+        }
+        textComputations.getOrPut(index) { mutableListOf() }
             .add(TextModification(text.toString(), Order.AFTER, insertionType))
     }
 
