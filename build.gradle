@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath "com.github.piacenti:antlr-kotlin-gradle-plugin:$antlrKotlinVersion"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.6.20"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.7.0"
 
     }
 }
