@@ -95,6 +95,7 @@ fun String.previewCharacters(maxStartAndEndCharacters: Int = 5): String {
         this
 }
 
+@Suppress("unused")
 fun RuleContext.parentHierarchy(): List<RuleContext> {
     var current: RuleContext? = this.readParent()
     val result = mutableListOf<RuleContext>()
@@ -106,8 +107,27 @@ fun RuleContext.parentHierarchy(): List<RuleContext> {
 }
 
 fun ParseTree.forEachRecursive(action: (ParseTree) -> Boolean) {
-    action(this)
-    this.children.forEach {
-        it.forEachRecursive(action)
+    if(action(this)) {
+        this.children.forEach {
+            it.forEachRecursive(action)
+        }
     }
+}
+@Suppress("unused")
+fun ParseTree.descendantsToList():List<ParseTree> {
+    val result= mutableListOf<ParseTree>()
+    this.forEachRecursive {
+        result.add(it)
+        true
+    }
+    return result
+}
+fun ParseTree.root():ParseTree {
+    var root= this
+    while(root.readParent()!=null){
+        root.readParent()?.also {
+            root=it
+        }
+    }
+    return root
 }
