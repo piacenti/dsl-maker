@@ -79,7 +79,7 @@ kotlin {
             dependsOn commonMain
             dependencies {
                 implementation (kotlin('stdlib-jdk8'))
-                implementation("org.slf4j:slf4j-api:2.0.0")
+                implementation("org.slf4j:slf4j-api:2.0.3")
             }
         }
         // JVM-specific tests and their dependencies:
