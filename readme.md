@@ -38,8 +38,12 @@ code only used for highlighting, another one for formatting and a third that cor
 ### Examples
 
 [ANTLR Completion](src%2FcommonTest%2Fkotlin%2Fpiacenti%2Fdslmaker%2Fdsl%2FFreeFormAntlrCompleterTest.kt)
+
+
 [ANTLR Completion with Indentation](src%2FcommonTest%2Fkotlin%2Fpiacenti%2Fdslmaker%2Fdsl%2FFreeFormAntlrCompleterTest.kt)
+
 [Recursive Descent Completer](src%2FcommonTest%2Fkotlin%2Fpiacenti%2Fdslmaker%2Fdsl%2FCompleterTest.kt)
+
 [ANTRL Highlighting and Formatting](src%2FcommonTest%2Fkotlin%2Fpiacenti%2Fdslmaker%2Fdsl%2FXMLFastHighlighterAndFormatterCommon.kt)
 
 **public key for validating dependency available from keyserver.ubuntu.com**
