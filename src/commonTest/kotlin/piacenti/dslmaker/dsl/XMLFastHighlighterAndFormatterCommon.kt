@@ -108,8 +108,6 @@ class XMLFastHighlighterAndFormatterCommon(override var exceptionOnFailure: Bool
         val lexer = XMLLexer(ANTLRInputStream(text))
         val captureErrorListener = CaptureErrorListener()
         if (exceptionOnFailure) {
-            //TODO: once library open up the recover method of the Lexer class for
-            // overriding then we can properly disable recovery here
             lexer.addErrorListener(captureErrorListener)
         }
         val tokenStream = CommonTokenStream(lexer)
