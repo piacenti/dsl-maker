@@ -235,10 +235,11 @@ signing {
         sign it
     }
 }
-tasks.configureEach { signTask ->
+tasks.all {signTask->
     if (signTask.name.contains("sign")) {
-        tasks.configureEach {
+        tasks.all {
             if (name.contains("publish")) {
+                println("${it.name} should run after ${signTask.name}")
                 it.mustRunAfter(signTask)
             }
         }
