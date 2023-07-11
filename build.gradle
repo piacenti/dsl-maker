@@ -78,7 +78,7 @@ kotlin {
         jvmMain {
             dependsOn commonMain
             dependencies {
-                implementation (kotlin('stdlib-jdk8'))
+                implementation(kotlin('stdlib-jdk8'))
                 implementation("org.slf4j:slf4j-api:2.0.5")
             }
         }
@@ -179,7 +179,7 @@ artifacts {
 // publishAllPublicationsToMavenCentralRepository closeAndReleaseMavenCentralStagingRepository
 group = "com.github.piacenti"
 version = "1.1.50"
-task publishToCentral{
+task publishToCentral {
     afterEvaluate {
         dependsOn(publishAllPublicationsToMavenCentralRepository, closeAndReleaseMavenCentralStagingRepository)
     }
@@ -195,32 +195,32 @@ nexusPublishing {
     }
 }
 publishing {
-    publications{
+    publications {
         all {
-            pom{
+            pom {
                 artifact javadocJar
-                name =group+":"+project.name
+                name = group + ":" + project.name
                 // optionally artifactId can be defined here
-                description ='''Kotlin multiplatform library to facilitate creation of DSLs with ANTLR or a simple built in parser'''
-                url ='https://github.com/piacenti/dsl-maker'
+                description = '''Kotlin multiplatform library to facilitate creation of DSLs with ANTLR or a simple built in parser'''
+                url = 'https://github.com/piacenti/dsl-maker'
 
                 scm {
-                    connection ='scm:git:git://github.com/piacenti/dsl-maker.git'
-                    developerConnection ='scm:git:ssh://github.com/piacenti/dsl-maker.git'
-                    url ='https://github.com/piacenti/dsl-maker/tree/main'
+                    connection = 'scm:git:git://github.com/piacenti/dsl-maker.git'
+                    developerConnection = 'scm:git:ssh://github.com/piacenti/dsl-maker.git'
+                    url = 'https://github.com/piacenti/dsl-maker/tree/main'
                 }
 
                 licenses {
                     license {
-                        name ='The Apache License, Version 2.0'
-                        url ='http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
 
                 developers {
                     developer {
-                        name ='Gabriel Piacenti'
-                        email ='piacenti10@gmail.com'
+                        name = 'Gabriel Piacenti'
+                        email = 'piacenti10@gmail.com'
                     }
                 }
             }
@@ -231,7 +231,16 @@ signing {
     def signingKey = System.getenv("SIGNING_KEY")
     def signingPassword = System.getenv("SIGNING_PASSWORD")
     useInMemoryPgpKeys(signingKey, signingPassword)
-    publishing.publications.forEach{
+    publishing.publications.forEach {
         sign it
+    }
+}
+tasks.configureEach { signTask ->
+    if (signTask.name.contains("sign")) {
+        tasks.configureEach {
+            if (name.contains("publish")) {
+                it.mustRunAfter(signTask)
+            }
+        }
     }
 }
