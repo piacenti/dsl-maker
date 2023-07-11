@@ -36,7 +36,7 @@ class LongParsingTest {
         (0..10).forEach {
             println(measureTimedValue {
                 parser3.parse(longer, true)
-            }.duration.inMilliseconds)
+            }.duration.inWholeMilliseconds)
         }
     }
 
@@ -48,7 +48,7 @@ class LongParsingTest {
                 val jsonLexer = JSONLexer(ANTLRInputStream(longer))
                 val jsonParser = JSONParser(CommonTokenStream(jsonLexer))
                 jsonParser.json()
-            }.duration.inMilliseconds)
+            }.duration.inWholeMilliseconds)
         }
     }
 }
