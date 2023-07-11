@@ -59,7 +59,7 @@ class LongParsingTest {
                 val jsonLexer = JSONLexer(CharStreams.fromString(longerJSON))
                 val jsonParser = JSONParser(CommonTokenStream(jsonLexer))
                 jsonParser.json()
-            }.duration.inMilliseconds)
+            }.duration.inWholeMilliseconds)
         }
     }
     @Test
