@@ -8,14 +8,13 @@ buildscript {
     }
     dependencies {
         classpath "com.github.piacenti:antlr-kotlin-gradle-plugin:$antlrKotlinVersion"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.8.20"
 
     }
 }
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.9.0'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.8.21"
-    id("org.jetbrains.dokka") version "1.8.20"
+    id 'org.jetbrains.kotlin.multiplatform' version '1.9.20'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.9.20"
+    id("org.jetbrains.dokka") version "1.9.10"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 apply plugin: 'maven-publish'
@@ -47,19 +46,6 @@ kotlin {
     }
 
     sourceSets {
-        commonAntlr {
-            dependencies {
-                api kotlin("stdlib-common")
-                // add antlr-kotlin-runtime
-                // otherwise, the generated sources will not compile
-                api "com.github.piacenti:antlr-kotlin-runtime:$antlrKotlinVersion"
-                // antlr-kotlin-runtime-jvm is automatically added as an jvm dependency by gradle.
-            }
-            // you have to add the generated sources the to the kotlin compiler source directory list
-            // this is not required if you use src/commonAntlr/kotlin
-            // and want to add the generated sources to version control
-            kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
-        }
         commonMain {
             dependencies {
                 implementation kotlin('stdlib-common')
@@ -68,15 +54,21 @@ kotlin {
             }
         }
         commonTest {
-            dependsOn commonAntlr
+            // you have to add the generated sources the to the kotlin compiler source directory list
+            // this is not required if you use src/commonAntlr/kotlin
+            // and want to add the generated sources to version control
+            kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
             dependencies {
                 implementation kotlin('test-common')
                 implementation kotlin('test-annotations-common')
-
+                implementation kotlin("stdlib")
+                // add antlr-kotlin-runtime
+                // otherwise, the generated sources will not compile
+                implementation "com.github.piacenti:antlr-kotlin-runtime:$antlrKotlinVersion"
+                // antlr-kotlin-runtime-jvm is automatically added as an jvm dependency by gradle.
             }
         }
         jvmMain {
-            dependsOn commonMain
             dependencies {
                 implementation(kotlin('stdlib-jdk8'))
                 implementation("org.slf4j:slf4j-api:2.0.5")
@@ -86,7 +78,6 @@ kotlin {
 
         jvmTest {
             kotlin.srcDirs(["$buildDir/generated-src/antlr"] as Set)
-            dependsOn commonTest
             dependencies {
                 implementation kotlin('test-junit')
 //                implementation "org.antlr:antlr4-runtime:4.7.1"
@@ -102,15 +93,13 @@ kotlin {
             }
         }
         jsMain {
-            dependsOn commonMain
             dependencies {
-                implementation kotlin('stdlib-js')
+                implementation kotlin('stdlib')
             }
         }
         jsTest {
-            dependsOn commonTest
             dependencies {
-                implementation kotlin('test-js')
+                implementation kotlin('test')
 
             }
         }
