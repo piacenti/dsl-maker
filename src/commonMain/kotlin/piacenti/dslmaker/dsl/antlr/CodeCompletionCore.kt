@@ -79,7 +79,7 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
         candidates.tokens.clear()
         statesProcessed = 0
         tokenStartIndex = context?.start?.tokenIndex ?: 0
-        val tokenStream: TokenStream = parser.tokenStream!!
+        val tokenStream: TokenStream = parser.tokenStream
         val currentIndex: Int = tokenStream.index()
         tokenStream.seek(tokenStartIndex)
         tokens = mutableListOf()
@@ -94,7 +94,7 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
         tokenStream.seek(currentIndex)
         val callStack: MutableList<Int> = mutableListOf()
         val startRule = context?.ruleIndex ?: 0
-        processRule(atn.ruleToStartState!![startRule]!!, 0, callStack, "\n")
+        processRule(atn.ruleToStartState!![startRule], 0, callStack, "\n")
         tokenStream.seek(currentIndex)
 
         // now post-process the rule candidates and find the last occurrences
@@ -176,19 +176,19 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
     private fun getFollowingTokens(initialTransition: Transition): MutableList<Int> {
         val result: MutableList<Int> = mutableListOf()
         val pipeline: MutableList<ATNState> = mutableListOf()
-        pipeline.add(initialTransition.target!!)
+        pipeline.add(initialTransition.target)
         while (!pipeline.isEmpty()) {
             val state: ATNState = pipeline.pop()
             for (transition in state.transitions) {
                 if (transition.serializationType == Transition.ATOM) {
                     if (!transition.isEpsilon) {
-                        val list: MutableList<Int> = transition.accessLabel()!!.toList().toMutableList()
+                        val list: MutableList<Int> = transition.label()!!.toList().toMutableList()
                         if (list.size == 1 && !ignoredTokens.contains(list[0])) {
                             result.add(list[0])
-                            pipeline.add(transition.target!!)
+                            pipeline.add(transition.target)
                         }
                     } else {
-                        pipeline.add(transition.target!!)
+                        pipeline.add(transition.target)
                     }
                 }
             }
@@ -225,25 +225,25 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
         for (transition in s.transitions) {
             if (transition.serializationType == Transition.RULE) {
                 val ruleTransition: RuleTransition = transition as RuleTransition
-                if (ruleStack.indexOf(ruleTransition.target!!.ruleIndex) != -1) {
+                if (ruleStack.indexOf(ruleTransition.target.ruleIndex) != -1) {
                     continue
                 }
-                ruleStack.add(ruleTransition.target!!.ruleIndex)
-                collectFollowSets(transition.target!!, stopState, followSets, seen, ruleStack)
+                ruleStack.add(ruleTransition.target.ruleIndex)
+                collectFollowSets(transition.target, stopState, followSets, seen, ruleStack)
                 ruleStack.pop()
             } else if (transition.serializationType == Transition.PREDICATE) {
                 if (checkPredicate(transition as PredicateTransition)) {
-                    collectFollowSets(transition.target!!, stopState, followSets, seen, ruleStack)
+                    collectFollowSets(transition.target, stopState, followSets, seen, ruleStack)
                 }
             } else if (transition.isEpsilon) {
-                collectFollowSets(transition.target!!, stopState, followSets, seen, ruleStack)
+                collectFollowSets(transition.target, stopState, followSets, seen, ruleStack)
             } else if (transition.serializationType == Transition.WILDCARD) {
                 val set = FollowSetWithPath()
                 set.intervals = IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType)
                 set.path = ruleStack.toMutableList()
                 followSets.add(set)
             } else {
-                var label: IntervalSet? = transition.accessLabel()
+                var label: IntervalSet? = transition.label()
                 if (label != null && label.size() > 0) {
                     if (transition.serializationType == Transition.NOT_SET) {
                         label = label.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType))!!
@@ -368,14 +368,14 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
             val transitions: MutableList<Transition> = currentEntry.state.transitions
             for (transition in transitions) {
                 if (transition.serializationType == Transition.RULE) {
-                    val endStatus = processRule(transition.target!!, currentEntry.tokenIndex, callStack, indentation)
+                    val endStatus = processRule(transition.target, currentEntry.tokenIndex, callStack, indentation)
                     for (position in endStatus) {
                         statePipeline.add(PipelineEntry((transition as RuleTransition).followState, position))
                     }
                 }
                 if (transition.serializationType == Transition.PREDICATE) {
                     if (checkPredicate(transition as PredicateTransition)) {
-                        statePipeline.add(PipelineEntry(transition.target!!, currentEntry.tokenIndex))
+                        statePipeline.add(PipelineEntry(transition.target, currentEntry.tokenIndex))
                     }
                 }
                 if (transition.serializationType == Transition.WILDCARD) {
@@ -388,15 +388,15 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
                             }
                         }
                     } else {
-                        statePipeline.add(PipelineEntry(transition.target!!, currentEntry.tokenIndex + 1))
+                        statePipeline.add(PipelineEntry(transition.target, currentEntry.tokenIndex + 1))
                     }
                 } else {
                     if (transition.isEpsilon) {
                         // Jump over simple states with a single outgoing epsilon transition.
-                        statePipeline.add(PipelineEntry(transition.target!!, currentEntry.tokenIndex))
+                        statePipeline.add(PipelineEntry(transition.target, currentEntry.tokenIndex))
                         continue
                     }
-                    var set: IntervalSet? = transition.accessLabel()
+                    var set: IntervalSet? = transition.label()
                     if (set != null && set.size() > 0) {
                         if (transition.serializationType == Transition.NOT_SET) {
                             set = set.complement(IntervalSet.of(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType))
@@ -417,7 +417,7 @@ class CodeCompletionCore(val parser: Parser, val preferredRules: MutableSet<Int>
                             }
                         } else {
                             if (set!!.contains(currentSymbol)) {
-                                statePipeline.add(PipelineEntry(transition.target!!, currentEntry.tokenIndex + 1))
+                                statePipeline.add(PipelineEntry(transition.target, currentEntry.tokenIndex + 1))
                             }
                         }
                     }

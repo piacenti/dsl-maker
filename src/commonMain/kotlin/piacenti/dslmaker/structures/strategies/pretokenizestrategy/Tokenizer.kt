@@ -36,7 +36,7 @@ class Tokenizer(val grammar: Grammar<*>) {
                         val value = matchedText!!.trim()
                         if (token.validateToken == null || token.validateToken.invoke(value)) {
                             tokens.add(Token(token,
-                                    value, matchedText!!, currentStart,   end))
+                                    value, matchedText, currentStart,   end))
                             currentStart = end
                             if (token.removeContext != null)
                                 contextStack.remove(token.removeContext)

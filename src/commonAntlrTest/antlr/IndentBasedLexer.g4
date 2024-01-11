@@ -19,7 +19,7 @@ private fun clear() {
 override fun nextToken(): Token {
     if (extraTokens.isEmpty() && finished) {
         clear()
-    } else if (input.LA(1) == EOF && !finished && dedentAtEnd) {
+    } else if (inputStream.LA(1) == EOF && !finished && dedentAtEnd) {
         repeat(indentStack.size) { _ ->
             extraTokens.add(CommonToken(lastToken!!).apply {
                 type = Tokens.DEDENT.id
@@ -38,7 +38,7 @@ override fun nextToken(): Token {
         val find = "\\s+as(\\s+\\w+)+?\\s*$".toRegex().find(nextToken.text!!)
         if (find != null) {
             val offset = nextToken.text!!.length - find.groupValues[0].length
-            resetAcceptPosition(input, _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset)
+            resetAcceptPosition(inputStream, _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset)
             emit()
             return token!!
         }

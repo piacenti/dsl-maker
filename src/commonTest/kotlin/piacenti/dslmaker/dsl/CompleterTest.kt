@@ -67,8 +67,8 @@ class AntlrCompleter : AutoCompleter {
         })
         result.addAll(suggestCompletions.rules.map { it.id }.mapNotNull {
             when (it) {
-                JSONParser.Rules.RULE_arr.id -> curry("[]", "array")
-                JSONParser.Rules.RULE_obj.id -> curry("{}", "object")
+                JSONParser.Rules.arr.id -> curry("[]", "array")
+                JSONParser.Rules.obj.id -> curry("{}", "object")
                 else -> null
             }
         })

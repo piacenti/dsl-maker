@@ -43,22 +43,22 @@ class FreeFormCompleter2 : AntlrAutoCompleter<FreeFormParser>() {
         val tokenIds = antlrCompletionData.tokens.map { it.id }
         result.addAll(ruleIds.mapNotNull { ruleId ->
             when (ruleId) {
-                Rules.RULE_value.id -> {
+                Rules.value.id -> {
                     listOf("free form text", "'single quoted text'", "\"double quoted text\":").map { completionFactory(it, "value") }
                 }
-                Rules.RULE_type.id -> listOf("codes:", "verbalizations:", "objects:").map { completionFactory(it, "keyword") }
-                Rules.RULE_criteria.id -> {
+                Rules.type.id -> listOf("codes:", "verbalizations:", "objects:").map { completionFactory(it, "keyword") }
+                Rules.criteria.id -> {
                     listOf(completionFactory("criteria\n", "keyword"))
                 }
-                Rules.RULE_and.id -> listOf(completionFactory(" and ", "logical operator"))
-                Rules.RULE_or.id -> listOf(completionFactory(" or ", "logical operator"))
+                Rules.and.id -> listOf(completionFactory(" and ", "logical operator"))
+                Rules.or.id -> listOf(completionFactory(" or ", "logical operator"))
                 else -> null
             }
         }.flatten())
         result.addAll(tokenIds.mapNotNull {
             when (it) {
                 Tokens.NEW_LINE.id -> {
-                    if (!ruleIds.contains(Rules.RULE_criteria.id))
+                    if (!ruleIds.contains(Rules.criteria.id))
                         completionFactory("\n", "new line")
                     else null
                 }

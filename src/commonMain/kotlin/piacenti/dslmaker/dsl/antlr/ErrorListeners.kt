@@ -23,7 +23,7 @@ class CaptureErrorListener : BaseErrorListener() {
     ) {
         super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e)
         val parser = recognizer as? Parser
-        val ruleInvocationStack = parser?.ruleInvocationStack?.reversed() ?: emptyList()
+        val ruleInvocationStack = parser?.getRuleInvocationStack()?.reversed() ?: emptyList()
         val ruleInvocationStackIds = ruleInvocationStack.mapNotNull { parser?.ruleIndexMap?.get(it) }
         val expectedTokenIds: List<Int> = parser?.expectedTokens?.toList() ?: emptyList()
         val expectedTokens =

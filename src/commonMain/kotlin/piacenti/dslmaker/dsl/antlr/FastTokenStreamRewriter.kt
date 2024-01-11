@@ -1,6 +1,6 @@
 package piacenti.dslmaker.dsl.antlr
 
-import com.strumenta.kotlinmultiplatform.assert
+import com.strumenta.antlrkotlin.runtime.assert
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.ParserRuleContext
 import org.antlr.v4.kotlinruntime.Token

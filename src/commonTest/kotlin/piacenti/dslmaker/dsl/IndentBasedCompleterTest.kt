@@ -62,10 +62,10 @@ class IndentBasedCompleterAntlr : AntlrAutoCompleter<IndentBasedParser>() {
         val tokenIds = antlrCompletionData.tokens.map { it.id }
         result.addAll(ruleIds.mapNotNull {
             when (it) {
-                Rules.RULE_alias.id -> {
+                Rules.alias.id -> {
                     listOf(completionFactory("as some header name", "alias"))
                 }
-                Rules.RULE_dataPath.id -> {
+                Rules.dataPath.id -> {
                     val jsonCompletion = completionFactory("$.someFiled.child[?(@.name=='something')].grandchild", "jsonpath")
                     val xmlCompletion = completionFactory("//someElement[name/text()='some value']/childElement", "xpath")
                     when (dataType) {
@@ -79,10 +79,10 @@ class IndentBasedCompleterAntlr : AntlrAutoCompleter<IndentBasedParser>() {
                     }
 
                 }
-                Rules.RULE_print.id -> {
+                Rules.print.id -> {
                     listOf(completionFactory("print\n", "action"))
                 }
-                Rules.RULE_name.id -> {
+                Rules.names.id -> {
                     if (dataType == DataType.XML)
                         listOf(completionFactory("name\n", "action"))
                     else null

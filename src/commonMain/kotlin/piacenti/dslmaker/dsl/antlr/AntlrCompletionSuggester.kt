@@ -26,7 +26,7 @@ data class ExpectationData(val id:Int, val ruleStack:List<Int>)
 data class AntlrCompletionData(val tokens: Set<ExpectationData>, val rules: Set<ExpectationData>, val highestTokenIndexReached: Int, val highestTextIndexReached: Int)
 class AntlrCompletionSuggester {
     fun suggestCompletions(parser: Parser): AntlrCompletionData {
-        val tokenStream = parser.tokenStream!! as CommonTokenStream
+        val tokenStream = parser.tokenStream as CommonTokenStream
         val allDefaultChannelTokenTypes = mutableListOf<Int>()
         val allTokens = mutableListOf<Token>()
         for (i in 0 until tokenStream.size()) {
@@ -37,7 +37,7 @@ class AntlrCompletionSuggester {
         //inject a fake token to replace EOF to make sure nothing will match it
         //so that we can exhaustively search for all rules that attempt to match at index
         allDefaultChannelTokenTypes[allDefaultChannelTokenTypes.lastIndex] = -10
-        val startRuleState = parser.atn.ruleToStartState!![0]!!
+        val startRuleState = parser.atn.ruleToStartState!![0]
 
         val result = runSimulation(parser, startRuleState, allDefaultChannelTokenTypes)
         //stop text index of highest reached normal token
@@ -83,7 +83,7 @@ class AntlrCompletionSuggester {
     data class StateIndexPair(val stateNumber: Int, val index: Int)
 
     private fun runSimulation(parser: Parser, startRuleState: RuleStartState, allTokens: MutableList<Int>): AntlrCompletionData {
-        var iterationCount = 0;
+//        var iterationCount = 0;
         var highestReachedIndex = 0
         val expectedTokens = mutableSetOf<ExpectationData>()
         val expectedRules = mutableSetOf<ExpectationData>()
@@ -109,7 +109,7 @@ class AntlrCompletionSuggester {
                 val currentBranch = branchStack.last()
                 if (currentBranch.iterator.hasNext()) {
                     val transition = currentBranch.iterator.next()
-                    val target = transition.target!!
+                    val target = transition.target
                     val statesPathOfMatch = currentBranch.statesPathOfMatch.toMutableList()
                     val pathOfMatch = currentBranch.pathOfMatch.toMutableList()
                     val tokensMatched = currentBranch.tokensMatched.toMutableList()
@@ -259,7 +259,7 @@ class AntlrCompletionSuggester {
                 } else {
                     //failed branch
                     //if current branch has no more iterations left then it failed
-                    val failedBranch = branchStack.pop()
+                    /*val failedBranch = */branchStack.pop()
 //                    currentRule.pathsToFailure.add(failedBranch.pathOfMatch)
                 }
             }

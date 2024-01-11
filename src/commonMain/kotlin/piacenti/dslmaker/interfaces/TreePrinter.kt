@@ -134,11 +134,11 @@ internal class ParserRuleContextGraphWrapper(private val parserRuleContext: Pars
         return if (parserRuleContext is TerminalNode) {
             val text = parserRuleContext.text
             if (text.isBlank()) {
-                parser.vocabulary.getDisplayName(parserRuleContext.symbol!!.type)
+                parser.vocabulary.getDisplayName(parserRuleContext.symbol.type)
             } else text.replace("\n", "\\n")
         } else {
             parserRuleContext as ParserRuleContext
-            parser.ruleNames!![parserRuleContext.ruleIndex]
+            parser.ruleNames[parserRuleContext.ruleIndex]
         }
     }
 }
@@ -175,7 +175,7 @@ private fun treeToString(tree: ParseTree, parser: Parser, buffer: StringBuilder,
     buffer.append(prefix)
     var string = tree.text.previewCharacters(maxStartAndEndCharacters).replace("\n", "\\n")
     if (tree is ParserRuleContext) {
-        val nodeIdentifier = parser.ruleNames!![tree.ruleIndex]
+        val nodeIdentifier = parser.ruleNames[tree.ruleIndex]
         if (nodeIdentifier.isNotBlank())
             buffer.append("$nodeIdentifier: $string")
         else

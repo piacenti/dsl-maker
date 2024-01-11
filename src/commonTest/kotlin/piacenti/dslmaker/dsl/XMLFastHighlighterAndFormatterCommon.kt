@@ -30,11 +30,11 @@ class XMLFastHighlighterAndFormatterCommon(override var exceptionOnFailure: Bool
                 val popoverText = ctx.parentHierarchy().mapNotNull {
                     it as? XMLParser.ElementContext
                 }.reversed().joinToString(separator = "/") {
-                    it.findElementStart()?.findCommonElementStart()?.Name()?.text ?: ""
+                    it.getElementStart()?.getCommonElementStart()?.Name()?.text ?: ""
                 }
                 highlightToken(ctx.OPEN()?.symbol, GOLD)
                 highlightToken(ctx.Name()?.symbol, LIGHT_BLUE, defaultElementAttributes + listOf("title" to "\"$popoverText\""))
-                ctx.findAttribute().forEach {
+                ctx.getAttribute().forEach {
                     highlightToken(it.Name()?.symbol, PURPLE)
                     highlightToken(it.STRING()?.symbol, GREEN)
                     highlightToken(it.EQUALS()?.symbol, GOLD)
@@ -49,7 +49,7 @@ class XMLFastHighlighterAndFormatterCommon(override var exceptionOnFailure: Bool
             }
             if (highlight) {
                 highlightToken(ctx.XMLDeclOpen()?.symbol, GOLD)
-                ctx.findAttribute().forEach {
+                ctx.getAttribute().forEach {
                     highlightToken(it.Name()?.symbol, PURPLE)
                     highlightToken(it.STRING()?.symbol, GREEN)
                     highlightToken(it.EQUALS()?.symbol, GOLD)
@@ -62,11 +62,11 @@ class XMLFastHighlighterAndFormatterCommon(override var exceptionOnFailure: Bool
         override fun exitElement(ctx: XMLParser.ElementContext) {
             if (format) {
                 val tabLevel = tabType * ctx.parentHierarchy().filterIsInstance<XMLParser.ElementContext>().size
-                if (ctx.findContent()?.findElement()?.isNotEmpty() == true) {
-                    ctx.findElementStart()?.stop?.let {
+                if (ctx.getContent()?.getElement()?.isNotEmpty() == true) {
+                    ctx.getElementStart()?.stop?.let {
                         rewriter.insertAfter(it, "\n", InsertionType.FORMAT)
                     }
-                    ctx.findElementEnd()?.let {
+                    ctx.getElementEnd()?.let {
                         rewriter.insertBefore(it.start!!, tabLevel, InsertionType.FORMAT)
                     }
                 }

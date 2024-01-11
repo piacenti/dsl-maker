@@ -1,21 +1,10 @@
-import com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask
-
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-    dependencies {
-        classpath "com.github.piacenti:antlr-kotlin-gradle-plugin:$antlrKotlinVersion"
-
-    }
-}
+import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
 plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '1.9.20'
     id "org.jetbrains.kotlin.plugin.serialization" version "1.9.20"
     id("org.jetbrains.dokka") version "1.9.10"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("com.strumenta.antlr-kotlin") version "$antlrKotlinVersion"
 }
 apply plugin: 'maven-publish'
 apply plugin: 'antlr'
@@ -50,7 +39,7 @@ kotlin {
             dependencies {
                 implementation kotlin('stdlib-common')
                 implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
-                api "com.github.piacenti:antlr-kotlin-runtime:$antlrKotlinVersion"
+                api "com.strumenta:antlr-kotlin-runtime:$antlrKotlinVersion"
             }
         }
         commonTest {
@@ -62,10 +51,6 @@ kotlin {
                 implementation kotlin('test-common')
                 implementation kotlin('test-annotations-common')
                 implementation kotlin("stdlib")
-                // add antlr-kotlin-runtime
-                // otherwise, the generated sources will not compile
-                implementation "com.github.piacenti:antlr-kotlin-runtime:$antlrKotlinVersion"
-                // antlr-kotlin-runtime-jvm is automatically added as an jvm dependency by gradle.
             }
         }
         jvmMain {
@@ -118,9 +103,9 @@ kotlin {
 
 task generateKotlinCommonGrammarSource(type: AntlrKotlinTask) {
     // the classpath used to run antlr code generation
-    antlrClasspath = configurations.detachedConfiguration(
-            project.dependencies.create("com.github.piacenti:antlr-kotlin-target:$antlrKotlinVersion")
-    )
+//    antlrClasspath = configurations.detachedConfiguration(
+//            project.dependencies.create("com.github.piacenti:antlr-kotlin-target:$antlrKotlinVersion")
+//    )
     maxHeapSize = "64m"
     packageName = "piacenti.dslmaker.antlr.generated"
 //    arguments = ["-atn"]
@@ -131,7 +116,7 @@ task generateKotlinCommonGrammarSource(type: AntlrKotlinTask) {
     }
     // outputDirectory is required, put it into the build directory
     // if you do not want to add the generated sources to version control
-    outputDirectory = file("$buildDir/generated-src/commonAntlr/kotlin")
+    outputDirectory = layout.buildDirectory.dir("generated-src/commonAntlr/kotlin").get().asFile
 }
 compileTestKotlinJvm.dependsOn generateKotlinCommonGrammarSource
 compileTestKotlinJs.dependsOn generateKotlinCommonGrammarSource
@@ -167,7 +152,7 @@ artifacts {
 // publish by calling tasks
 // publishAllPublicationsToMavenCentralRepository closeAndReleaseMavenCentralStagingRepository
 group = "com.github.piacenti"
-version = "1.1.51"
+version = "1.1.52"
 task publishToCentral {
     afterEvaluate {
         dependsOn(publishAllPublicationsToMavenCentralRepository, closeAndReleaseMavenCentralStagingRepository)

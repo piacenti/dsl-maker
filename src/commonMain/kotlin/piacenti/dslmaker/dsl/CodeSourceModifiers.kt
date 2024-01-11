@@ -29,10 +29,10 @@ object IntRangeSerializer : KSerializer<IntRange> {
     private const val startIndex = 0
     private const val endIndex = 1
 
-    override fun serialize(encoder: Encoder, obj: IntRange) {
+    override fun serialize(encoder: Encoder, value: IntRange) {
         val compositeOutput = encoder.beginStructure(descriptor)
-        compositeOutput.encodeStringElement(descriptor, startIndex, obj.first.toString())
-        compositeOutput.encodeStringElement(descriptor, endIndex, obj.last.toString())
+        compositeOutput.encodeStringElement(descriptor, startIndex, value.first.toString())
+        compositeOutput.encodeStringElement(descriptor, endIndex, value.last.toString())
         compositeOutput.endStructure(descriptor)
     }
 
