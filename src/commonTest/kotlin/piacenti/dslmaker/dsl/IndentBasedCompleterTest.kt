@@ -46,7 +46,7 @@ class IndentBasedCompleterAntlr : AntlrAutoCompleter<IndentBasedParser>() {
     override fun runStartRule(parser: IndentBasedParser): IndentBasedParser.MainContext {
         val main = parser.main()
         ParseTreeWalker().walk(DataTypeResolver(), main)
-        dataType = main.dataType
+        dataType = main.dataType!!
         return main
     }
 
@@ -62,10 +62,10 @@ class IndentBasedCompleterAntlr : AntlrAutoCompleter<IndentBasedParser>() {
         val tokenIds = antlrCompletionData.tokens.map { it.id }
         result.addAll(ruleIds.mapNotNull {
             when (it) {
-                Rules.alias.id -> {
+                Rules.Alias -> {
                     listOf(completionFactory("as some header name", "alias"))
                 }
-                Rules.dataPath.id -> {
+                Rules.DataPath -> {
                     val jsonCompletion = completionFactory("$.someFiled.child[?(@.name=='something')].grandchild", "jsonpath")
                     val xmlCompletion = completionFactory("//someElement[name/text()='some value']/childElement", "xpath")
                     when (dataType) {
@@ -79,10 +79,10 @@ class IndentBasedCompleterAntlr : AntlrAutoCompleter<IndentBasedParser>() {
                     }
 
                 }
-                Rules.print.id -> {
+                Rules.Print -> {
                     listOf(completionFactory("print\n", "action"))
                 }
-                Rules.names.id -> {
+                Rules.Names -> {
                     if (dataType == DataType.XML)
                         listOf(completionFactory("name\n", "action"))
                     else null
@@ -92,11 +92,11 @@ class IndentBasedCompleterAntlr : AntlrAutoCompleter<IndentBasedParser>() {
         }.flatten())
         result.addAll(tokenIds.mapNotNull {
             when (it) {
-                Tokens.NEW_LINE.id -> {
+                Tokens.NEW_LINE -> {
                     completionFactory("\n", "new line")
                 }
-                Tokens.INDENT.id -> completionFactory("\t", "indent")
-                Tokens.DEDENT.id -> completionFactory("", "dedent")
+                Tokens.INDENT -> completionFactory("\t", "indent")
+                Tokens.DEDENT -> completionFactory("", "dedent")
                 else -> null
             }
         })

@@ -61,14 +61,14 @@ class AntlrCompleter : AutoCompleter {
         val suggestCompletions = AntlrCompletionSuggester().suggestCompletions(parser)
         result.addAll(suggestCompletions.tokens.map { it.id }.mapNotNull {
             when (it) {
-                JSONParser.Tokens.STRING.id -> curry("\"some value\"", "value")
+                JSONParser.Tokens.STRING -> curry("\"some value\"", "value")
                 else -> null
             }
         })
         result.addAll(suggestCompletions.rules.map { it.id }.mapNotNull {
             when (it) {
-                JSONParser.Rules.arr.id -> curry("[]", "array")
-                JSONParser.Rules.obj.id -> curry("{}", "object")
+                JSONParser.Rules.Arr -> curry("[]", "array")
+                JSONParser.Rules.Obj -> curry("{}", "object")
                 else -> null
             }
         })

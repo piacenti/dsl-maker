@@ -43,27 +43,27 @@ class FreeFormCompleter2 : AntlrAutoCompleter<FreeFormParser>() {
         val tokenIds = antlrCompletionData.tokens.map { it.id }
         result.addAll(ruleIds.mapNotNull { ruleId ->
             when (ruleId) {
-                Rules.value.id -> {
+                Rules.Value -> {
                     listOf("free form text", "'single quoted text'", "\"double quoted text\":").map { completionFactory(it, "value") }
                 }
-                Rules.type.id -> listOf("codes:", "verbalizations:", "objects:").map { completionFactory(it, "keyword") }
-                Rules.criteria.id -> {
+                Rules.Type -> listOf("codes:", "verbalizations:", "objects:").map { completionFactory(it, "keyword") }
+                Rules.Criteria -> {
                     listOf(completionFactory("criteria\n", "keyword"))
                 }
-                Rules.and.id -> listOf(completionFactory(" and ", "logical operator"))
-                Rules.or.id -> listOf(completionFactory(" or ", "logical operator"))
+                Rules.And -> listOf(completionFactory(" and ", "logical operator"))
+                Rules.Or -> listOf(completionFactory(" or ", "logical operator"))
                 else -> null
             }
         }.flatten())
         result.addAll(tokenIds.mapNotNull {
             when (it) {
-                Tokens.NEW_LINE.id -> {
-                    if (!ruleIds.contains(Rules.criteria.id))
+                Tokens.NEW_LINE -> {
+                    if (!ruleIds.contains(Rules.Criteria))
                         completionFactory("\n", "new line")
                     else null
                 }
-                Tokens.OPEN.id -> completionFactory(" ( ", "start of logical block")
-                Tokens.CLOSE.id -> completionFactory(" ) ", "end of logical block")
+                Tokens.OPEN -> completionFactory(" ( ", "start of logical block")
+                Tokens.CLOSE -> completionFactory(" ) ", "end of logical block")
                 else -> null
             }
         })

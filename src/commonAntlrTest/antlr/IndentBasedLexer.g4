@@ -22,7 +22,7 @@ override fun nextToken(): Token {
     } else if (inputStream.LA(1) == EOF && !finished && dedentAtEnd) {
         repeat(indentStack.size) { _ ->
             extraTokens.add(CommonToken(lastToken!!).apply {
-                type = Tokens.DEDENT.id
+                type = Tokens.DEDENT
                 channel = Token.DEFAULT_CHANNEL
             })
         }
@@ -34,7 +34,7 @@ override fun nextToken(): Token {
     }
     var nextToken = super.nextToken() as CommonToken
     lastToken = nextToken
-    if (nextToken.type == Tokens.DATA_PATH.id) {
+    if (nextToken.type == Tokens.DATA_PATH) {
         val find = "\\s+as(\\s+\\w+)+?\\s*$".toRegex().find(nextToken.text!!)
         if (find != null) {
             val offset = nextToken.text!!.length - find.groupValues[0].length
@@ -43,14 +43,14 @@ override fun nextToken(): Token {
             return token!!
         }
     }
-    if (nextToken.type == Tokens.SPACES.id) {
+    if (nextToken.type == Tokens.SPACES) {
         val numberOfSpaces = nextToken.text!!.split("\n").last().length
         if (numberOfSpaces > indentStack.lastOrNull() ?: 0) {
-            nextToken.type = Tokens.INDENT.id
+            nextToken.type = Tokens.INDENT
             nextToken.channel = Token.DEFAULT_CHANNEL
             indentStack.add(numberOfSpaces)
         } else if (numberOfSpaces < indentStack.lastOrNull() ?: 0) {
-            nextToken.type = Tokens.DEDENT.id
+            nextToken.type = Tokens.DEDENT
             nextToken.channel = Token.DEFAULT_CHANNEL
             //from the end find the indentation that matches num spaces and dedent as many times as needed
             for (x in indentStack.lastIndex downTo 0) {
